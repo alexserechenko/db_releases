@@ -1,0 +1,26 @@
+stages:
+  - test
+  - deploy
+
+variables:
+  ORACLE_USER: "sys"
+  ORACLE_PASSWORD: "oracle"
+  ORACLE_HOST: "localhost"
+  ORACLE_PORT: "1521"
+  ORACLE_SID: "CDBA"
+
+test_sql:
+  image: container-registry.oracle.com/database/instantclient:latest
+  stage: test
+  script:
+    - echo "Running SQL test script"
+    - echo exit | sqlplus -S "$ORACLE_USER/$ORACLE_PASSWORD@//$ORACLE_HOST:$ORACLE_PORT/$ORACLE_SID" @scripts/test.sql
+
+deploy_sql:
+  image: container-registry.oracle.com/database/instantclient:latest
+  stage: deploy
+  script:
+    - echo "Deploying to Oracle DB"
+    - echo exit | sqlplus -S "$ORACLE_USER/$ORACLE_PASSWORD@//$ORACLE_HOST:$ORACLE_PORT/$ORACLE_SID" @scripts/deploy.sql
+  only:
+    - main
